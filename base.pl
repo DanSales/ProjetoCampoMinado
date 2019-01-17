@@ -2,6 +2,13 @@
 mina(0,1).
 mina(1,2).
 mina(2,0).
+mina(1,1).
+mina(5,7).
+mina(7,4).
+mina(6,8).
+mina(3,1).
+mina(9,6).
+mina(5,5).
 
 %Checador se a casa e mina ou nao, retornando 1 se for e 0 caso contrario
 eMina(Linha,Coluna,R):-
@@ -46,7 +53,51 @@ contarValor(X,Y,Valor):-
 
   Valor is R1+R2+R3+R4+R5+R6+R7+R8.
 
-jogada(Linha, Coluna):-
+jogada(Linha, Coluna,R):-
   (mina(Linha,Coluna) ->
-    write('Voce Perdeu')
-    ; contarValor(Linha,Coluna,V), write(V)).
+    R is -1
+    ; contarValor(Linha,Coluna,V), write(V), R = V).
+
+
+soma([],0).
+soma([H|T],S):-soma(T,G),S is H+G.
+
+replace([_|T], 0, X, [X|T]).
+replace([H|T], I, X, [H|R]):- I > -1, NI is I-1, replace(T, NI, X, R), !.
+
+inicio(Linha, Coluna, L1, L2, L3, Cond):-
+  soma(L1,S),
+  (Cond > -1, S > 8 ->
+    write('Jogada:'),nl,
+    write(Linha),
+    write('-'),
+    write(Coluna),nl,
+    jogada(Linha, Coluna, V),
+    Pos is Linha*10 + Coluna,
+    replace(L2, Pos, V, NL2),
+    %L2 is NL2, %Atulizar valor das casas
+    write(NL2),nl,%SEGURA NA MAO DE DEUS E VAI
+    replace(L1, Pos, 0, NL1),
+    %L1 is NL1, %Marcar como visitado
+    write('Resultado:'),
+    write(V),nl,
+    %ATUALIZAR AS probabilidades
+    random(0,9,X),
+    random(0,9,Y),
+    inicio(X,Y, NL1, NL2, NL3, V)
+    ;write('Fim do Jogo'),nl
+    /*(Cond < 0 ->
+      write('Voce ganhou')
+      ;write('Voce perdeu')
+    ),*/
+  ).
+
+main :-
+  Lvisitados = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  Lcasas = [-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2],
+  Lprobabilidades = [0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1],
+
+  Linha = 4,
+  Coluna = 5,
+  inicio(Linha, Coluna, Lvisitados, Lcasas, Lprobabilidades, 0),
+  write('Feito por Daniel Henrique e Luis Filipe').
